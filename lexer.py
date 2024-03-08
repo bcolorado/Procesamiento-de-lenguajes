@@ -60,17 +60,17 @@ class Lexer:
             r'\bpara\b': 'para',
             r'\bleer\b': 'leer',
             # built-int
-            r'\bacadena\(\)': 'acadena',
-            r'\balogico\(\)': 'alogico',
-            r'\banumero\(\)': 'anumero',
-            r'\bimprimir\(\)': 'imprimir',
-            r'\bescribir\(\)': 'escribir',
-            r'\bponer\(\)': 'poner',
-            r'\bimprimirf\(\)': 'imprimirf',
-            r'\bincluir\(\)': 'incluir',
-            r'\bleer\(\)': 'leer',
-            r'\blimpiar\(\)': 'limpiar',
-            r'\btipo\(\)': 'tipo',
+            r'\bacadena\b': 'acadena',
+            r'\balogico\b': 'alogico',
+            r'\banumero\b': 'anumero',
+            r'\bimprimir\b': 'imprimir',
+            r'\bescribir\b': 'escribir',
+            r'\bponer\b': 'poner',
+            r'\bimprimirf\b': 'imprimirf',
+            r'\bincluir\b': 'incluir',
+            r'\bleer\b': 'leer',
+            r'\blimpiar\b': 'limpiar',
+            r'\btipo\b': 'tipo',
             # Logical
             r'!=': 'tkn_neq',
             r'~=': 'tkn_regex',
@@ -79,11 +79,6 @@ class Lexer:
             r'<=': 'tkn_leq',
             r'>=': 'tkn_geq',
             r'==': 'tkn_equal',
-            r'\+': 'tkn_plus',
-            r'-': 'tkn_minus',
-            r'=': 'tkn_assign',
-            r'<': 'tkn_less',
-            r'>': 'tkn_greater',
             r'&&': 'tkn_and',
             r'\|\|': 'tkn_or',
             r'\.\.': 'tkn_concat',
@@ -92,6 +87,11 @@ class Lexer:
             r'\*=': 'tkn_times_assign',
             r'-=': 'tkn_minus_assign',
             r'\+=': 'tkn_plus_assign',
+            r'\+': 'tkn_plus',
+            r'-': 'tkn_minus',
+            r'=': 'tkn_assign',
+            r'<': 'tkn_less',
+            r'>': 'tkn_greater',
             r'\*': 'tkn_times',
             r'/': 'tkn_div',
             r'\^': 'tkn_power',
@@ -195,8 +195,7 @@ class Lexer:
 
     def skip_multi_line_comment(self):
         while self.position < len(self.code) - 1 and not (self.code[self.position] == '*' and self.code[self.position + 1] == '/'):
-            self.advance(
-                2) if self.code[self.position] == '\n' else self.advance()
+            self.advance() if self.code[self.position] == '\n' else self.advance()
         if self.position >= len(self.code) - 1:
             return False  # Comment is not closed
         self.advance(2)  # Skip the closing '*/' characters
@@ -205,8 +204,8 @@ class Lexer:
     def get_keywords_singletkns(self):
         return self.keywords_singletkns
 
-source_code="""+== """
 
+source_code = """Siu :D"""
 lexer = Lexer(source_code)
 tokens = lexer.tokenize()
 definitions = lexer.get_keywords_singletkns()
