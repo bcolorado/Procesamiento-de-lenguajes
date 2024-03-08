@@ -1,6 +1,5 @@
 import re
 
-
 def printTokens(tokens, definitions):
     if tokens:
         for token in tokens:
@@ -27,7 +26,6 @@ class Lexer:
         self.tokens = []
 
         self.keywords_singletkns = {
-
             # Keywords
             r'\bcaso\b': 'caso',
             r'\bcierto\b': 'cierto',
@@ -58,30 +56,72 @@ class Lexer:
             r'\bsino\b': 'sino',
             r'\btipo\b': 'tipo',
             r'\brango\b': 'rango',
+            r'\ben\b': 'en',
+            r'\bpara\b': 'para',
+            r'\bleer\b': 'leer',
+            # built-int
+            r'\bacadena\(\)': 'acadena',
+            r'\balogico\(\)': 'alogico',
+            r'\banumero\(\)': 'anumero',
+            r'\bimprimir\(\)': 'imprimir',
+            r'\bescribir\(\)': 'escribir',
+            r'\bponer\(\)': 'poner',
+            r'\bimprimirf\(\)': 'imprimirf',
+            r'\bincluir\(\)': 'incluir',
+            r'\bleer\(\)': 'leer',
+            r'\blimpiar\(\)': 'limpiar',
+            r'\btipo\(\)': 'tipo',
             # Logical
+            r'!=': 'tkn_neq',
+            r'~=': 'tkn_regex',
+            r'\+\+': 'tkn_increment',
+            r'--': 'tkn_decrement',
+            r'<=': 'tkn_leq',
+            r'>=': 'tkn_geq',
+            r'==': 'tkn_equal',
             r'\+': 'tkn_plus',
             r'-': 'tkn_minus',
             r'=': 'tkn_assign',
             r'<': 'tkn_less',
             r'>': 'tkn_greater',
+            r'&&': 'tkn_and',
+            r'\|\|': 'tkn_or',
+            r'\.\.': 'tkn_concat',
+            r'%=': 'tkn_mod_assign',
+            r'/=': 'tkn_div_assign',
+            r'\*=': 'tkn_times_assign',
+            r'-=': 'tkn_minus_assign',
+            r'\+=': 'tkn_plus_assign',
+            r'\*': 'tkn_times',
+            r'/': 'tkn_div',
+            r'\^': 'tkn_power',
+            r'%': 'tkn_mod',
+            r'!': 'tkn_not',
             # Other
             r'\.': 'tkn_period',
+            r',': 'tkn_comma',
             r'\(': 'tkn_opening_par',
             r'\)': 'tkn_closing_par',
+            r';': 'tkn_semicolon',
+            r':': 'tkn_colon',
+            r'{': 'tkn_opening_key',
+            r'}': 'tkn_closing_key',
+            r'\[': 'tkn_opening_bra',
+            r'\]': 'tkn_closing_bra',
 
         }
 
         self.other_tkns = {
             # General
             r'[a-zA-Z_]\w*': 'id',
-            r'"([^"\\]|\\.)*"': 'tkn_str',
+            r'"((?:[^"\\]|\\.)*)"|\'((?:[^\'\\]|\\.)*)\'': 'tkn_str',
             r'\d+(\.\d+)?': 'tkn_real',
 
         }
 
         # Define token dictionary
         self.token_definitions = {
-            **self.keywords_singletkns, **self.other_tkns,}
+            **self.keywords_singletkns, **self.other_tkns, }
 
     def advance(self, steps=1):
         for i in range(steps):
@@ -127,7 +167,7 @@ class Lexer:
                 if match:
                     value = match.group(0)
                     if token_type == 'tkn_str':
-                        # Remove surrounding quotes from the string value
+                        newValue = value.replace('\n', '\\n')
                         newValue = value[1:-1]
                         self.add_token(token_type, newValue,
                                        token_row, token_column)
@@ -165,18 +205,8 @@ class Lexer:
     def get_keywords_singletkns(self):
         return self.keywords_singletkns
 
+source_code="""+== """
 
-# Example usage
-source_code = """fun getSubject()
-  escribir("Lenguajes pa (◕‿◕)")
-  como se retornaba? :C
-fin  
-
-"""
-
-source_code1 = """desde
-
-"""
 lexer = Lexer(source_code)
 tokens = lexer.tokenize()
 definitions = lexer.get_keywords_singletkns()
