@@ -1,14 +1,5 @@
 import re
 
-def printTokens(tokens, definitions):
-    if tokens:
-        for token in tokens:
-            if token.type in definitions.values():
-                print(f'<{token.type},{token.row},{token.column}>')
-            else:
-                print(f'<{token.type},{token.value},{token.row},{token.column}>')
-
-
 class Token:
     def __init__(self, type, value, row, column):
         self.type = type
@@ -122,6 +113,15 @@ class Lexer:
         # Define token dictionary
         self.token_definitions = {
             **self.keywords_singletkns, **self.other_tkns, }
+        
+
+    def printTokens(self):
+        if self.tokens:
+            for token in self.tokens:
+                if token.type in self.keywords_singletkns.values():
+                    print(f'<{token.type},{token.row},{token.column}>')
+                else:
+                    print(f'<{token.type},{token.value},{token.row},{token.column}>')
 
     def advance(self, steps=1):
         for i in range(steps):
@@ -151,7 +151,7 @@ class Lexer:
                 open_multiComment_row = self.row
                 open_multiComment_col = self.column
                 if not self.skip_multi_line_comment():
-                    printTokens(self.tokens, self.keywords_singletkns)
+                    self.printTokens()
                     print(
                         f">>> Error lexico (linea: {open_multiComment_row}, posicion: {open_multiComment_col})")
                     return
@@ -179,7 +179,7 @@ class Lexer:
                     break
 
             if not match_found:
-                printTokens(self.tokens, self.keywords_singletkns)
+                self.printTokens()
                 print(
                     f">>> Error lexico (linea: {self.row}, posicion: {self.column})")
                 return
@@ -203,10 +203,3 @@ class Lexer:
 
     def get_keywords_singletkns(self):
         return self.keywords_singletkns
-
-
-source_code = """Siu :D"""
-lexer = Lexer(source_code)
-tokens = lexer.tokenize()
-definitions = lexer.get_keywords_singletkns()
-printTokens(tokens, definitions)
