@@ -15,8 +15,9 @@ class SyntaxAnalyzer:
         error = False
 
         for token in tokens:
-            while not self.match and not error and self.derivationStack:
+            while not self.match:
                 current_element = self.derivationStack.pop()
+                
                 if current_element[0].isupper():
                     rule = self.lookForMatch(current_element, token)
                     if rule == 'error':
@@ -45,6 +46,8 @@ class SyntaxAnalyzer:
         for rule in self.grammar[current_element]:
             for i in rule:
                 if i[0].isupper():
+                    if i == current_element:
+                        continue
                     possible = self.lookForMatch(i, token)
                     if possible != 'error':
                         match = rule
@@ -76,7 +79,7 @@ class SyntaxAnalyzer:
         print(error_message)
 
 
-source_code = """2"""
+source_code = """pan_danes pan_danes"""
 
 lexer = Lexer(source_code)
 
@@ -87,6 +90,13 @@ grammar = {
     'CADENA': [['tkn_str',]]
 }
 
-syntax_analyzer = SyntaxAnalyzer(lexer, grammar['PROGRAMA'], grammar)
+grammarTest = {
+    "S": [["D", "A", "EOF"],],
+    "D": [["pan_danes", "C", "pan_danes"], ["empty"],],
+    "A": [["pan_ajo", "C", "pan_ajo"],],
+    "C": [["lechuga", "C"], ["tomate", "C"], ["cebolla", "C"], ["jamon", "C"],["empty"]],
+}
+
+syntax_analyzer = SyntaxAnalyzer(lexer, "S", grammarTest)
 
 syntax_analyzer.parse_program()

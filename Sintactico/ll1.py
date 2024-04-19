@@ -95,10 +95,17 @@ test = {
     '<B>': [('b',), ('c',)]
 }
 
+grammarTest = {
+    "S": [("D", "A"),],
+    "D": [("pan_danes", "C", "pan_danes"), ("empty"),],
+    "A": [("pan_ajo", "C", "pan_ajo"),],
+    "C": [("lechuga", "C"), ("tomate", "C"), ("cebolla", "C"), ("jamon", "C"),("empty")],
+}
+
 
 
 # Crear instancia del analizador de gramática
-analyzer = GrammarAnalyzer(grammar)
+analyzer = GrammarAnalyzer(grammarTest)
 
 # Calcular conjuntos de primeros, siguientes y predicción
 analyzer.calculate_first_sets()
