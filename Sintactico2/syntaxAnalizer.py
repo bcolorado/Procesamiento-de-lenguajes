@@ -6,7 +6,7 @@ class SyntaxAnalyzer:
     def __init__(self, lexer, root, grammar):
         self.lexer = lexer
         self.predictionSet = set()
-        self.derivationStack = deque(root[0])
+        self.derivationStack = deque([root])
         self.match = False
         self.grammar = grammar
 
@@ -15,7 +15,7 @@ class SyntaxAnalyzer:
         error = False
 
         for token in tokens:
-            while not self.match:
+            while not self.match and self.derivationStack and not error:
                 current_element = self.derivationStack.pop()
                 
                 if current_element[0].isupper():
@@ -29,7 +29,7 @@ class SyntaxAnalyzer:
                                 self.derivationStack.append(i)
                 else:
                     self.predictionSet.add(current_element)
-                    if current_element == token.value or current_element == token.type:
+                    if current_element == token.type:
                         self.match = True
                         self.predictionSet.clear()
                     else:
@@ -54,7 +54,7 @@ class SyntaxAnalyzer:
                         return match
                 elif i == 'empty':
                     return rule
-                elif i == token.value or i == token.type :
+                elif i == token.type :
                     return rule
                 else:
                     self.predictionSet.add(i)
@@ -79,12 +79,14 @@ class SyntaxAnalyzer:
         print(error_message)
 
 
-source_code = """pan_danes pan_danes"""
+source_code = """
+id = 2.7 haoisdh
+ """
 
 lexer = Lexer(source_code)
 
 grammar = {
-    'PROGRAMA': [['SENTENCIA']],
+    'PROGRAMA': [['SENTENCIA', 'EOF']],
     'SENTENCIA': [['LLAMADA_FUNCION']],
     'LLAMADA_FUNCION': [['escribir', '(', 'CADENA', ')']],
     'CADENA': [['tkn_str',]]
@@ -97,6 +99,16 @@ grammarTest = {
     "C": [["lechuga", "C"], ["tomate", "C"], ["cebolla", "C"], ["jamon", "C"],["empty"]],
 }
 
-syntax_analyzer = SyntaxAnalyzer(lexer, "S", grammarTest)
+ultimateGrammar = {
+    'PROGRAMA': [['SENTENCIA', '$']],
+    'SENTENCIA': [['LLAMADA_FUNCION','ASIGNACION' ], ["empty"]],
+    'LLAMADA_FUNCION': [['escribir', 'tkn_opening_par', 'CADENA', 'tkn_closing_par'], ['empty']],
+    'ASIGNACION': [['IDENTIFICADOR', 'tkn_assign', 'EXPRESION'], ['empty']],
+    'IDENTIFICADOR': [['id',]],
+    'EXPRESION': [['tkn_real',], ['tkn_str',], ['IDENTIFICADOR']],
+    'CADENA': [['tkn_str',]]
+}
+
+syntax_analyzer = SyntaxAnalyzer(lexer, "PROGRAMA", ultimateGrammar)
 
 syntax_analyzer.parse_program()
