@@ -223,12 +223,12 @@ class SyntaxAnalyzer:
         for token in tokens:
             while not self.match and self.derivationStack and not error:
                 current_element = self.derivationStack.pop()
+                
                 if current_element[0].isupper():
                     rule = self.lookForMatch(current_element, token)
                     if rule == 'error':
                         error = True
                         self.report_error(token)
-                        break
                     else:
                         for i in reversed(rule):
                             if i != 'empty':
@@ -241,11 +241,9 @@ class SyntaxAnalyzer:
                     else:
                         error = True
                         self.report_error(token)
-                        break
             self.match = False  # Reset match for the next token
             if error:
                 break
-           
         if not error:
             print('El analisis sintactico ha finalizado exitosamente.')
 
@@ -262,46 +260,48 @@ class SyntaxAnalyzer:
                         return match
                 elif i == 'empty':
                     return rule
-                elif i == token.type:
+                elif i == token.type :
                     return rule
                 else:
                     self.predictionSet.add(i)
         return match
 
+
     def get_tokens(self):
         self.lexer.tokenize()
         return self.lexer.tokens
 
-    def report_error(self, token):
-
+    def report_error(self, token ):
+        
         founded = f"\"{token.value}\"" if token.type == 'tkn_str' else token.value
 
+        
         sorted_prediction_set = sorted(self.predictionSet)
 
-        expected = ', '.join(
-            f'"{item if item != "tkn_str" else "cadena_de_caracteres"}"' for item in sorted_prediction_set)
+       
+        expected = ', '.join(f'"{item if item != "tkn_str" else "cadena_de_caracteres"}"' for item in sorted_prediction_set)
 
         error_message = f"<{token.row}:{token.column}> Error sintactico: se encontro: {founded}; se esperaba: {expected}"
         print(error_message)
 
 
 source_code = """
-id = escribir
-"""
+id = 2.7
+escribir("Hola mundo")
+ """
 
 lexer = Lexer(source_code)
 
 ultimateGrammar = {
-    'PROGRAMA': [['SENTENCIA']],
-    'SENTENCIA': [['LLAMADA_FUNCION'], ['ASIGNACION']],
-    'LLAMADA_FUNCION': [['escribir', 'tkn_opening_par', 'CADENA', 'tkn_closing_par']],
-    'ASIGNACION': [['IDENTIFICADOR', 'tkn_assign', 'EXPRESION']],
+    'PROGRAMA': [['SENTENCIA', '$']],
+    'SENTENCIA': [['LLAMADA_FUNCION','ASIGNACION' ], ["empty"]],
+    'LLAMADA_FUNCION': [['escribir', 'tkn_opening_par', 'CADENA', 'tkn_closing_par'], ['SENTENCIA'], ['empty']],
+    'ASIGNACION': [['IDENTIFICADOR', 'tkn_assign', 'EXPRESION'],['SENTENCIA'], ['empty']],
     'IDENTIFICADOR': [['id',]],
     'EXPRESION': [['tkn_real',], ['tkn_str',], ['IDENTIFICADOR']],
     'CADENA': [['tkn_str',]]
 }
 
-
-syntax_analyzer = SyntaxAnalyzer(lexer, 'PROGRAMA', ultimateGrammar)
+syntax_analyzer = SyntaxAnalyzer(lexer, "PROGRAMA", ultimateGrammar)
 
 syntax_analyzer.parse_program()
